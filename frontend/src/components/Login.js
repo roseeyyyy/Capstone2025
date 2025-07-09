@@ -1,36 +1,40 @@
-import React, { useState } from 'react';
 import { API } from '../api';
+import { useState } from 'react';
 
-const Login = ({ onLogin }) => {
+function Login({ onLogin }) {
   const [pin, setPin] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await API.post('/auth/login', { pin });
+
+      console.log(res.data); // 👈 add this for debugging
+
       if (res.data.role === 'admin') {
         onLogin('admin');
+      } else if (res.data.role === 'staff') {
+        onLogin('staff');
       } else {
-        alert('Access denied. Not an admin.');
+        alert('Access denied.');
       }
     } catch (err) {
-      alert('Invalid PIN');
+      alert(err.response?.data?.error || 'Something went wrong.');
+      console.error(err);
     }
   };
 
   return (
     <form onSubmit={handleLogin}>
-      <h2>Admin Login</h2>
       <input
         type="password"
         value={pin}
         onChange={(e) => setPin(e.target.value)}
         placeholder="Enter PIN"
-        required
       />
       <button type="submit">Login</button>
     </form>
   );
-};
+}
 
 export default Login;
