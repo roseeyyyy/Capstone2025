@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API } from '../api';
 import LeaveRequestDetails from './LeaveRequestDetails';
 
-const ViewAllRequests = ({ onBack }) => {
+function ViewAllRequests ({ onBack }) {
   const [requests, setRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
@@ -36,7 +36,7 @@ const ViewAllRequests = ({ onBack }) => {
   }
 
   return (
-    <div>
+    <div className="container">
       <h2>All Leave Requests</h2>
       <button onClick={onBack}>Back to Dashboard</button>
       <br /><br />

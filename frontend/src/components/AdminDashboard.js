@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const AdminDashboard = ({ onLogout }) => {
   return (
-    <div>
+    <div className="container">
       <h2>Admin Dashboard</h2>
 
       {/* Button to View All Requests */}

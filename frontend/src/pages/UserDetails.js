@@ -18,11 +18,14 @@ function UserDetails() {
   if (!user) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="container">
       <h2>User Details</h2>
       <p><strong>Name:</strong> {user.name}</p>
       <p><strong>Type:</strong> {user.type}</p>
+      <p><strong>Email:</strong> {user.email}</p>
+      <p><strong>Contact Number:</strong> {user.number}</p>
       <p><strong>PIN:</strong> {user.pin}</p>
+      
 
       <button onClick={() => navigate('/manage-users')}>Back to Manage Users</button>
     </div>

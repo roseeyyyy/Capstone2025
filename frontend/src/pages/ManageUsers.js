@@ -19,7 +19,7 @@ function ManageUsers() {
   }, [filter]);
 
   return (
-    <div>
+    <div className="container">
       <h2>Manage Users</h2>
 
       <div>
