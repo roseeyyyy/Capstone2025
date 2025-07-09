@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import LogoutButton from './LogoutButton';
-import ViewAllRequests from './ViewAllRequests';
+import { Link } from 'react-router-dom';
 
 const AdminDashboard = ({ onLogout }) => {
-  const [page, setPage] = useState('dashboard');
-
   return (
     <div>
-      {page === 'dashboard' && (
-        <>
-          <h2>Admin Dashboard</h2>
-          <button onClick={() => setPage('requests')}>View All Requests</button>
-          <button onClick={() => alert('Leave History Page')}>Leave History</button>
-          <button onClick={() => alert('Manage Users Page')}>Manage Users</button>
-          <br /><br />
-          <LogoutButton onLogout={onLogout} />
-        </>
-      )}
+      <h2>Admin Dashboard</h2>
 
-      {page === 'requests' && (
-        <ViewAllRequests onBack={() => setPage('dashboard')} />
-      )}
+      {/* Button to View All Requests */}
+      <Link to="/view-requests">
+        <button>View All Requests</button>
+      </Link>
+
+      {/* Leave History — can set up route later */}
+      <button onClick={() => alert('Leave History Page Coming Soon')}>Leave History</button>
+
+      {/* Manage Users */}
+      <Link to="/manage-users">
+        <button>Manage Users</button>
+      </Link>
+
+      <br /><br />
+      <LogoutButton onLogout={onLogout} />
     </div>
   );
 };
