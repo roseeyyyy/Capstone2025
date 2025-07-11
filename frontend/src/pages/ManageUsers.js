@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { API } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -7,16 +7,16 @@ function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     const res = await API.get('/users', {
       params: { type: filter }
     });
     setUsers(res.data);
-  };
+  },[filter]);
 
   useEffect(() => {
     fetchUsers();
-  }, [filter]);
+  }, [fetchUsers]);
 
   return (
     <div className="container">
@@ -60,6 +60,7 @@ function ManageUsers() {
           ))}
         </tbody>
       </table>
+      <button onClick={() => navigate('/dashboard')}>Back</button>
     </div>
   );
 }

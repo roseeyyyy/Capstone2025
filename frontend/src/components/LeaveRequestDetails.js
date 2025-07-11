@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { API } from '../api';
 
 const LeaveRequestDetails = ({ requestId, onBack }) => {
   const [request, setRequest] = useState(null);
 
-  useEffect(() => {
-    fetchRequest();
-  }, []);
-
-  const fetchRequest = async () => {
+  const fetchRequest = useCallback(async () => {
     const res = await API.get(`/leaves/${requestId}`);
     setRequest(res.data);
-  };
+  }, [requestId]);
+  
+  useEffect(() => {
+    fetchRequest();
+  }, [fetchRequest]);
 
   const updateStatus = async (status) => {
     await API.put(`/leaves/${requestId}`, { status });

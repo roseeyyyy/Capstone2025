@@ -1,21 +1,22 @@
 import express from 'express';
+import db from '../models/db.js';
 const router = express.Router();
-
-// Dummy user data for now — replace with MySQL calls later
-let users = [
-  { id: 1, name: 'Rose', type: 'Manager', email: 'rose@gmail.com', number: '123456789', pin: '1234' },
-  { id: 2, name: 'Alex', type: 'FOH', pin: '5678' },
-  { id: 3, name: 'Mika', type: 'BOH', pin: '9876' },
-];
 
 // Get all users
 router.get('/', (req, res) => {
   const { type } = req.query;
+  let query = 'SELECT * FROM users';
+  const params = [];
+
   if (type) {
-    const filtered = users.filter(u => u.type === type);
-    return res.json(filtered);
+    query += ' WHERE type = ?';
+    params.push(type);
   }
-  res.json(users);
+
+  db.query(query, params, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
 });
 
 // Get user by id
@@ -27,17 +28,13 @@ router.get('/:id', (req, res) => {
 
 // Create new user
 router.post('/', (req, res) => {
-  const { name, type, email, number, pin } = req.body;
-  const newUser = {
-    id: users.length + 1,
-    name,
-    type,
-    email,
-    number,
-    pin
-  };
-  users.push(newUser);
-  res.status(201).json(newUser);
+  const { name, type, pin, email, contact_number } = req.body;
+  const query = 'INSERT INTO users (name, type, pin, email, contact_number) VALUES (?, ?, ?, ?, ?)';
+  db.query(query, [name, type, pin, email, contact_number], (err, result) => {
+    if (err) return res.status(500).json({ error: err });
+    res.status(201).json({ message: 'User created', userId: result.insertId });
+  });
 });
+
 
 export default router;

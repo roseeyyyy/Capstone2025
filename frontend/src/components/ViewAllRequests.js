@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { API } from '../api';
 import LeaveRequestDetails from './LeaveRequestDetails';
+import { useNavigate } from 'react-router-dom';
 
 function ViewAllRequests ({ onBack }) {
   const [requests, setRequests] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [selectedRequestId, setSelectedRequestId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRequests();
@@ -38,7 +40,7 @@ function ViewAllRequests ({ onBack }) {
   return (
     <div className="container">
       <h2>All Leave Requests</h2>
-      <button onClick={onBack}>Back to Dashboard</button>
+      <button onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
       <br /><br />
 
       <input

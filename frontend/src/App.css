@@ -13,6 +13,7 @@ h2 {
   text-align: center;
 }
 
+/* Containers */
 .container {
   max-width: 900px;
   margin: 40px auto;
@@ -42,9 +43,11 @@ button:hover {
 input[type="text"],
 input[type="number"],
 input[type="password"],
+input[type="date"],
+textarea,
 select {
   padding: 10px;
-  margin: 8px 0;
+  margin: 8px 0 20px 0;
   border: 1px solid #ccc;
   border-radius: 6px;
   width: 100%;
@@ -96,4 +99,44 @@ select {
 
 .back-button:hover {
   background-color: #7f8c8d;
+}
+
+/* ===== Leave Form Styles ===== */
+.form-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-container label {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.form-container button {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.form-container textarea {
+  min-height: 80px;
+  resize: vertical;
 }

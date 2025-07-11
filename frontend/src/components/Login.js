@@ -21,7 +21,7 @@ function Login() {
         alert('Access denied.');
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Invalid PIN.');
+      alert(err.response?.data?.error || 'Invalid PIN.');
       console.error(err);
     }
   };

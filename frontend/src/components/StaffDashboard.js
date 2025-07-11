@@ -9,7 +9,7 @@ function StaffDashboard({ onLogout }) {
     <div className="container">
       <h2>Staff Dashboard</h2>
 
-      <button onClick={() => navigate('/request-leave')}>
+      <button onClick={() => navigate('/leave-form')}>
         Request Leave
       </button>
 

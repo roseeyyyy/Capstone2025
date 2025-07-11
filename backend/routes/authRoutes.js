@@ -1,30 +1,36 @@
 import express from 'express';
+import db from '../models/db.js';
+
 const router = express.Router();
 
-// Example hardcoded PINs — later replace this with a MySQL query
-const users = [
-  { pin: '1234', role: 'admin' },
-  { pin: '5678', role: 'staff' },
-];
-
-// Login route
+// Login route using MySQL database
 router.post('/login', (req, res) => {
   const { pin } = req.body;
 
-  // Validate input
   if (!pin) {
     return res.status(400).json({ error: 'PIN is required' });
   }
 
-  // Check if pin exists
-  const user = users.find((u) => u.pin === pin);
+  const query = 'SELECT * FROM users WHERE pin = ? LIMIT 1';
+  db.query(query, [pin], (err, results) => {
+    if (err) {
+      console.error('Error fetching user:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
 
-  if (!user) {
-    return res.status(401).json({ error: 'Invalid PIN' });
-  }
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Invalid PIN' });
+    }
 
-  // Return role if valid
-  res.json({ role: user.role });
+    const user = results[0];
+
+    // Return role if valid
+    res.json({
+      role: user.type === 'Manager' ? 'admin' : 'staff',
+      userId: user.id,
+      name: user.name
+    });
+  });
 });
 
 export default router;
