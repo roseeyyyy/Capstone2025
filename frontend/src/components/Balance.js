@@ -1,85 +1,105 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API } from '../api';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function Balance() {
   const navigate = useNavigate();
-  const staff_id = localStorage.getItem('staff_id');
+  const staff_id = localStorage.getItem('userId');
 
-  // Set entitlements per type
-  const entitlements = {
-    Annual: 20,
-    Sick: 10,
-    Lieu: 5
-  };
+  const [balance, setBalance] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [balances, setBalances] = useState({
-    Annual: 0,
-    Sick: 0,
-    Lieu: 0
-  });
+  const fetchLeaveBalance = useCallback(async () => {
+    if (!staff_id) {
+      setError('Staff ID not found. Please log in again.');
+      setLoading(false);
+      return;
+    }
 
-  const fetchLeaveBalance = async () => {
     try {
-      const res = await API.get(`/api/leaves?staff_id=${staff_id}`);
-      const approvedLeaves = res.data.filter(leave => leave.status === 'Approved');
-
-      // Initialize counts
-      let totals = {
-        Annual: 0,
-        Sick: 0,
-        Lieu: 0
-      };
-
-      // Calculate days taken for each leave type
-      approvedLeaves.forEach((leave) => {
-        const start = new Date(leave.start_date);
-        const end = new Date(leave.end_date);
-        const diffTime = Math.abs(end - start);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-        if (totals[leave.type] !== undefined) {
-          totals[leave.type] += diffDays;
-        }
-      });
-
-      setBalances(totals);
+      const res = await API.get(`/leaves/${staff_id}/balance`);
+      setBalance(res.data.data);
     } catch (err) {
       console.error('Failed to fetch leave balance', err);
-      alert('Could not load leave balance.');
+      setError('Failed to fetch leave balance.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [staff_id]);
 
   useEffect(() => {
     fetchLeaveBalance();
-  }, []);
+  }, [fetchLeaveBalance]);
+
+  if (loading) {
+    return <div className="container mt-4">Loading leave balances...</div>;
+  }
+
+  if (error) {
+    return <div className="container mt-4 text-danger">{error}</div>;
+  }
+
+  const remainingAnnual = balance.annual_leave_entitlement - balance.used_annual;
+  const remainingSick = balance.sick_leave_entitlement - balance.used_sick;
+  const remainingLieu = balance.lieu_entitlement - balance.used_lieu;
 
   return (
-    <div className="container">
-      <h2>Leave Balances</h2>
+    <div className="container mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <button
+          className="btn btn-outline-secondary"
+          onClick={() => navigate('/staff-dashboard')}
+        >
+          <i className="bi-arrow-left me-2"></i> Back
+        </button>
+        <h4 className="mb-0">Leave Balances</h4>
+        <div></div>
+      </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Leave Type</th>
-            <th>Entitlement</th>
-            <th>Used</th>
-            <th>Remaining</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.keys(entitlements).map((type) => (
-            <tr key={type}>
-              <td>{type}</td>
-              <td>{entitlements[type]} days</td>
-              <td>{balances[type] || 0} days</td>
-              <td>{entitlements[type] - (balances[type] || 0)} days</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <button onClick={() => navigate('/staff-dashboard')}>Back</button>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-striped table-hover align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Leave Type</th>
+                  <th>Entitlement</th>
+                  <th>Used</th>
+                  <th>Remaining</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Annual Leave</td>
+                  <td>{balance.annual_leave_entitlement} days</td>
+                  <td>{balance.used_annual} days</td>
+                  <td>{remainingAnnual >= 0 ? remainingAnnual : 0} days</td>
+                </tr>
+                <tr>
+                  <td>Sick Leave</td>
+                  <td>{balance.sick_leave_entitlement} days</td>
+                  <td>{balance.used_sick} days</td>
+                  <td>{remainingSick >= 0 ? remainingSick : 0} days</td>
+                </tr>
+                <tr>
+                  <td>Lieu Leave</td>
+                  <td>{balance.lieu_entitlement} days</td>
+                  <td>{balance.used_lieu} days</td>
+                  <td>{remainingLieu >= 0 ? remainingLieu : 0} days</td>
+                </tr>
+                <tr>
+                  <td>Unpaid Leave</td>
+                  <td>—</td>
+                  <td>{balance.used_unpaid} days</td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
