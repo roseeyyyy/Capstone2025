@@ -1,40 +1,83 @@
 import express from 'express';
 import db from '../models/db.js';
+
 const router = express.Router();
 
-// Get all users
+// Get all users, optionally filtered by role
 router.get('/', (req, res) => {
-  const { type } = req.query;
-  let query = 'SELECT * FROM users';
+  const { role } = req.query;
+  let query = 'SELECT * FROM user';
   const params = [];
 
-  if (type) {
-    query += ' WHERE type = ?';
-    params.push(type);
+  if (role) {
+    query += ' WHERE role = ?';
+    params.push(role);
   }
 
   db.query(query, params, (err, results) => {
-    if (err) return res.status(500).json({ error: err });
+    if (err) {
+      console.error('Error fetching users:', err.sqlMessage);
+      return res.status(500).json({ error: err.sqlMessage });
+    }
     res.json(results);
   });
 });
 
 // Get user by id
 router.get('/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id));
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  res.json(user);
+  const query = 'SELECT * FROM user WHERE user_id = ?';
+  db.query(query, [req.params.id], (err, results) => {
+    if (err) {
+      console.error('Error fetching user:', err.sqlMessage);
+      return res.status(500).json({ error: err.sqlMessage });
+    }
+    if (results.length === 0) return res.status(404).json({ error: 'User not found' });
+    res.json(results[0]);
+  });
 });
 
 // Create new user
 router.post('/', (req, res) => {
-  const { name, type, pin, email, contact_number } = req.body;
-  const query = 'INSERT INTO users (name, type, pin, email, contact_number) VALUES (?, ?, ?, ?, ?)';
-  db.query(query, [name, type, pin, email, contact_number], (err, result) => {
-    if (err) return res.status(500).json({ error: err });
-    res.status(201).json({ message: 'User created', userId: result.insertId });
-  });
+  const { first_name, last_name, role, pin, email, contact_number } = req.body;
+  const query = `
+    INSERT INTO user (first_name, last_name, role, pin, email, contact_number)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+  db.query(
+    query,
+    [first_name, last_name, role, pin, email, contact_number],
+    (err, result) => {
+      if (err) {
+        console.error('Error creating user:', err.sqlMessage);
+        return res.status(500).json({ error: err.sqlMessage });
+      }
+      res.status(201).json({ message: 'User created', userId: result.insertId });
+    }
+  );
 });
 
+// ✅ Update existing user by id
+router.put('/:id', (req, res) => {
+  const { first_name, last_name, role, pin, email, contact_number } = req.body;
+  const query = `
+    UPDATE user
+    SET first_name = ?, last_name = ?, role = ?, pin = ?, email = ?, contact_number = ?
+    WHERE user_id = ?
+  `;
+  db.query(
+    query,
+    [first_name, last_name, role, pin, email, contact_number, req.params.id],
+    (err, result) => {
+      if (err) {
+        console.error('Error updating user:', err.sqlMessage);
+        return res.status(500).json({ error: err.sqlMessage });
+      }
+      if (result.affectedRows === 0)
+        return res.status(404).json({ error: 'User not found' });
+
+      res.json({ message: 'User updated successfully' });
+    }
+  );
+});
 
 export default router;

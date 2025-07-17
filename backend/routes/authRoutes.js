@@ -11,7 +11,7 @@ router.post('/login', (req, res) => {
     return res.status(400).json({ error: 'PIN is required' });
   }
 
-  const query = 'SELECT * FROM users WHERE pin = ? LIMIT 1';
+  const query = 'SELECT * FROM user WHERE pin = ? LIMIT 1';
   db.query(query, [pin], (err, results) => {
     if (err) {
       console.error('Error fetching user:', err);
@@ -24,11 +24,15 @@ router.post('/login', (req, res) => {
 
     const user = results[0];
 
+    // Validate against allowed roles
+    const validRoles = ['Admin', 'Manager', 'FOH', 'BOH'];
+    const role = validRoles.includes(user.role) ? user.role : 'Unknown';
+
     // Return role if valid
     res.json({
-      role: user.type === 'Manager' ? 'admin' : 'staff',
-      userId: user.id,
-      name: user.name
+      role: role,
+      userId: user.user_id,
+      name: `${user.first_name} ${user.last_name}`
     });
   });
 });

@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use('/api/leaves', leaveRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+// app.use('/api', leaveRoutes);
 
 // default test route
 app.get('/', (req, res) => {

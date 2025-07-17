@@ -46,17 +46,21 @@ router.get('/history/:user_id', (req, res) => {
 router.get('/history', (req, res) => {
   const query = `
     SELECT 
-      request_id,
-      user_id,
-      leave_type,
-      start_date,
-      end_date,
-      reason,
-      leave_status,
-      created_at
-    FROM leave_request
-    WHERE leave_status IN ('approved', 'disapproved')
-    ORDER BY created_at DESC`;
+      lr.request_id,
+      lr.user_id,
+      u.first_name,
+      u.last_name,
+      lr.leave_type,
+      lr.start_date,
+      lr.end_date,
+      lr.reason,
+      lr.leave_status,
+      lr.created_at
+    FROM leave_request lr
+    JOIN user u ON lr.user_id = u.user_id
+    WHERE lr.leave_status IN ('approved', 'disapproved')
+    ORDER BY lr.created_at DESC
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
@@ -80,11 +84,13 @@ router.get('/staff/:user_id', (req, res) => {
     WHERE user_id = ? 
       AND leave_status = 'approved'
   `;
+
   db.query(query, [user_id], (err, results) => {
     if (err) {
       console.error('Error fetching approved leaves:', err);
       return res.status(500).json({ error: 'Database error' });
     }
+
     res.json(results);
   });
 });
@@ -104,14 +110,17 @@ router.get('/:id/balance', (req, res) => {
     FROM employee_leave 
     WHERE user_id = ?
   `;
+
   db.query(query, [userId], (err, result) => {
     if (err) {
       console.error('Error retrieving balance data:', err);
       return res.status(500).json({ error: 'Failed to retrieve database record.' });
     }
+
     if (result.length === 0) {
       return res.status(404).json({ error: 'No leave record found for this user.' });
     }
+
     res.json({ data: result[0] });
   });
 });
@@ -128,14 +137,17 @@ router.get('/:id', (req, res) => {
     JOIN user u ON lr.user_id = u.user_id
     WHERE lr.request_id = ?
   `;
+
   db.query(query, [req.params.id], (err, results) => {
     if (err) {
       console.error('Error fetching leave request details:', err);
       return res.status(500).json({ error: 'Database error' });
     }
+
     if (results.length === 0) {
       return res.status(404).json({ error: 'Leave request not found' });
     }
+
     res.json(results[0]);
   });
 });
@@ -158,6 +170,7 @@ router.get('/', (req, res) => {
       console.error('Error fetching leave requests:', err);
       return res.status(500).json({ error: 'Database error' });
     }
+
     res.json(results);
   });
 });
@@ -192,6 +205,7 @@ router.put('/:id', (req, res) => {
 
     if (newStatus === 'approved') {
       // Fetch leave request details
+
       const selectLeaveQuery = 'SELECT * FROM leave_request WHERE request_id = ?';
       db.query(selectLeaveQuery, [leaveId], (err, results) => {
         if (err || results.length === 0) {
@@ -230,6 +244,8 @@ router.put('/:id', (req, res) => {
           } else if (leaveType === 'lieu') {
             remainingEntitlement = balance.lieu_entitlement - balance.used_lieu;
             usedField = 'used_lieu';
+          } else if (leaveType === 'unpaid') {
+            usedField = 'used_unpaid'
           } else {
             return res.status(400).json({ error: 'Invalid leave type' });
           }
