@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(''); // Reset error before trying login
+
     try {
       const res = await API.post('/auth/login', { pin });
       console.log('Role returned from backend:', res.data.role);
@@ -26,11 +29,11 @@ function Login() {
           navigate('/staff-dashboard');
           break;
         default:
-          alert('Access denied.');
+          setError('Access denied.');
       }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || 'Invalid PIN.');
+      setError(err.response?.data?.error || 'Invalid PIN.');
     }
   };
 
@@ -51,14 +54,16 @@ function Login() {
             <input
               id="pin"
               type="password"
-              className="form-control"
+              className={`form-control ${error ? 'is-invalid' : ''}`}
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               placeholder="4 digit PIN"
               required
               autoFocus
             />
+            {error && <div className="invalid-feedback">{error}</div>}
           </div>
+
           <button type="submit" className="btn btn-primary w-100 mt-3">
             <i className="bi bi-box-arrow-in-right me-2"></i> Login
           </button>

@@ -16,7 +16,7 @@ function LeaveHistory() {
       setLeaveHistory(res.data);
     } catch (err) {
       console.error('Failed to fetch leave history:', err);
-      alert('Could not load leave history.');
+      //alert('Could not load leave history.');
     }
   }, [userId]);
 

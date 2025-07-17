@@ -23,7 +23,7 @@ const LeaveRequestDetails = ({ requestId, onBack }) => {
 
   const updateStatus = async (status) => {
     await API.put(`/leaves/${requestId}`, { status });
-    alert(`Request ${status}`);
+    //alert(`Request ${status}`);
     onBack();
   };
 

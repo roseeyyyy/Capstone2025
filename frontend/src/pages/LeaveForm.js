@@ -13,6 +13,9 @@ function LeaveForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -26,7 +29,11 @@ function LeaveForm() {
     if (!formData.type) newErrors.type = 'Leave type is required.';
     if (!formData.startDate) newErrors.startDate = 'Start date is required.';
     if (!formData.endDate) newErrors.endDate = 'End date is required.';
-    if (formData.startDate && formData.endDate && new Date(formData.startDate) > new Date(formData.endDate)) {
+    if (
+      formData.startDate &&
+      formData.endDate &&
+      new Date(formData.startDate) > new Date(formData.endDate)
+    ) {
       newErrors.date = 'Start date cannot be after end date.';
     }
     if (!formData.reason) newErrors.reason = 'Reason is required.';
@@ -36,10 +43,13 @@ function LeaveForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setShowAlert(false);
 
     const userId = localStorage.getItem('userId');
     if (!userId) {
-      alert('Please login first.');
+      setMessage('Please login first.');
+      setMessageType('danger');
+      setShowAlert(true);
       return;
     }
 
@@ -47,11 +57,18 @@ function LeaveForm() {
 
     try {
       await API.post('/leaves', { ...formData, userId });
-      alert('Leave request submitted!');
-      navigate('/staff-dashboard');
+      setMessage('Leave request submitted successfully!');
+      setMessageType('success');
+      setShowAlert(true);
+
+      setTimeout(() => {
+        navigate('/staff-dashboard');
+      }, 1500);
     } catch (err) {
       console.error('Failed to submit leave request:', err.response?.data || err.message);
-      alert(err.response?.data?.error || 'Failed to submit leave request.');
+      setMessage(err.response?.data?.error || 'Failed to submit leave request.');
+      setMessageType('danger');
+      setShowAlert(true);
     }
   };
 
@@ -69,6 +86,18 @@ function LeaveForm() {
         <h4 className="mb-0 text-center flex-grow-1">Leave Request Form</h4>
         <div style={{ width: '42px' }}></div>
       </div>
+
+      {/* Alert Message */}
+      {showAlert && (
+        <div className={`alert alert-${messageType} alert-dismissible fade show`} role="alert">
+          {message}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowAlert(false)}
+          ></button>
+        </div>
+      )}
 
       {/* Card */}
       <div className="card shadow-sm">
@@ -132,7 +161,7 @@ function LeaveForm() {
               <div className="invalid-feedback">{errors.reason}</div>
             </div>
 
-            {/* Buttons */}
+            {/* Submit */}
             <div className="d-flex justify-content-end">
               <button type="submit" className="btn btn-primary">
                 Submit Request

@@ -12,10 +12,16 @@ function CreateUser() {
   const [pin, setPin] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' or 'danger'
+  const [showAlert, setShowAlert] = useState(false);
+
   const navigate = useNavigate();
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    setShowAlert(false);
+
     try {
       setIsSaving(true);
       await API.post('/users', {
@@ -26,11 +32,19 @@ function CreateUser() {
         contact_number: number,
         pin,
       });
-      alert('User created!');
-      navigate('/manage-users');
+
+      setMessage('User created successfully!');
+      setMessageType('success');
+      setShowAlert(true);
+
+      setTimeout(() => {
+        navigate('/manage-users');
+      }, 1500);
     } catch (err) {
       console.error('Failed to create user', err);
-      alert('Could not create user.');
+      setMessage(err.response?.data?.error || 'Could not create user.');
+      setMessageType('danger');
+      setShowAlert(true);
     } finally {
       setIsSaving(false);
     }
@@ -51,6 +65,19 @@ function CreateUser() {
         <div style={{ width: '42px' }}></div>
       </div>
 
+      {/* Alert Message */}
+      {showAlert && (
+        <div className={`alert alert-${messageType} alert-dismissible fade show`} role="alert">
+          {message}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setShowAlert(false)}
+          ></button>
+        </div>
+      )}
+
+      {/* Form Card */}
       <div className="card shadow-sm border-0">
         <div className="card-body">
           <form onSubmit={handleCreate}>
