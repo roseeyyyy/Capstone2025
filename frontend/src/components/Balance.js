@@ -34,11 +34,22 @@ function Balance() {
   }, [fetchLeaveBalance]);
 
   if (loading) {
-    return <div className="container mt-4">Loading leave balances...</div>;
+    return (
+      <div className="container mt-5 text-center">
+        <div className="spinner-border text-primary" role="status"></div>
+        <p className="mt-3">Loading leave balances...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="container mt-4 text-danger">{error}</div>;
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
   }
 
   const remainingAnnual = balance.annual_leave_entitlement - balance.used_annual;
@@ -46,18 +57,20 @@ function Balance() {
   const remainingLieu = balance.lieu_entitlement - balance.used_lieu;
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+    <div className="container py-4">
+      {/* Top bar */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
         <button
           className="btn btn-outline-secondary"
           onClick={() => navigate('/staff-dashboard')}
         >
-          <i className="bi-arrow-left me-2"></i> Back
+          <i className="bi bi-arrow-left me-2"></i> Back
         </button>
         <h4 className="mb-0">Leave Balances</h4>
-        <div></div>
+        <div style={{ width: '42px' }}></div>
       </div>
 
+      {/* Card */}
       <div className="card shadow-sm">
         <div className="card-body">
           <div className="table-responsive">

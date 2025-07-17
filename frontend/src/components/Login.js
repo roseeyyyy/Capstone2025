@@ -10,34 +10,64 @@ function Login() {
     e.preventDefault();
     try {
       const res = await API.post('/auth/login', { pin });
+      console.log('Role returned from backend:', res.data.role);
 
-      console.log(res.data); // Debugging
+      localStorage.setItem('userId', res.data.userId);
+      localStorage.setItem('userName', res.data.name);
+      localStorage.setItem('userRole', res.data.role);
 
-      if (res.data.role === 'admin') {
-        navigate('/dashboard');
-      } else if (res.data.role === 'staff') {
-        navigate('/staff-dashboard');
-      } else {
-        alert('Access denied.');
+      switch (res.data.role) {
+        case 'Admin':
+          navigate('/dashboard');
+          break;
+        case 'Manager':
+        case 'FOH':
+        case 'BOH':
+          navigate('/staff-dashboard');
+          break;
+        default:
+          alert('Access denied.');
       }
     } catch (err) {
-      alert(err.response?.data?.error || 'Invalid PIN.');
       console.error(err);
+      alert(err.response?.data?.error || 'Invalid PIN.');
     }
   };
 
   return (
-    <div className="container">
-      <form onSubmit={handleLogin}>
-        <h2>Enter your PIN to Login</h2>
-        <input
-          type="password"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          placeholder="Enter PIN"
-        />
-        <button type="submit">Login</button>
-      </form>
+    <div className="container vh-100 d-flex justify-content-center align-items-center bg-light">
+      <div className="card p-4 shadow rounded-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <div className="text-center mb-4">
+          <i className="bi bi-calendar-check display-4 text-primary"></i>
+          <h2 className="fw-bold mt-2">Leave Form System</h2>
+          <p className="text-muted mb-0">Leave Portal</p>
+        </div>
+
+        <form onSubmit={handleLogin}>
+          <div className="mb-3">
+            <label htmlFor="pin" className="form-label fw-semibold">
+              Enter your PIN
+            </label>
+            <input
+              id="pin"
+              type="password"
+              className="form-control"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              placeholder="4 digit PIN"
+              required
+              autoFocus
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100 mt-3">
+            <i className="bi bi-box-arrow-in-right me-2"></i> Login
+          </button>
+        </form>
+
+        <div className="text-center mt-4 text-muted" style={{ fontSize: '0.85rem' }}>
+          &copy; {new Date().getFullYear()} Leave Form System
+        </div>
+      </div>
     </div>
   );
 }

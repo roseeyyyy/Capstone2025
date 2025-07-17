@@ -1,17 +1,14 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
-function LogoutButton() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // optionally clear any localStorage/session data here if used
-    navigate('/');
-  };
-
+function LogoutButton({ onLogout }) {
   return (
-    <button onClick={handleLogout}>
-      Logout
+    <button
+      className="btn btn-outline-secondary rounded-circle"
+      onClick={onLogout}
+      title="Logout"
+    >
+      <i className="bi-box-arrow-right fs-4"></i>
     </button>
   );
 }

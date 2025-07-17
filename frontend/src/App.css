@@ -3,11 +3,11 @@ body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f5f7fa;
+  background-color: #e0e0e0;  /* softer light gray background */
   color: #333;
 }
 
-h2 {
+h2, h3 {
   color: #2c3e50;
   margin-bottom: 20px;
   text-align: center;
@@ -17,15 +17,25 @@ h2 {
 .container {
   max-width: 900px;
   margin: 40px auto;
+  flex-wrap: wrap;
   padding: 30px;
-  background-color: #fff;
+  background-color: #fefefe; /* off-white for contrast */
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
 /* Button Styles */
 button {
-  background-color: #3498db;
+  background-color: #b33a3a; /* muted/darker red */
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -36,7 +46,16 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #8b2e2e; /* darker on hover */
+}
+
+/* Back button */
+.back-button {
+  background-color: #95a5a6;
+}
+
+.back-button:hover {
+  background-color: #7f8c8d;
 }
 
 /* Form Elements */
@@ -92,15 +111,6 @@ select {
   color: #7f8c8d;
 }
 
-/* Back button */
-.back-button {
-  background-color: #95a5a6;
-}
-
-.back-button:hover {
-  background-color: #7f8c8d;
-}
-
 /* ===== Leave Form Styles ===== */
 .form-container {
   max-width: 600px;
@@ -139,4 +149,17 @@ select {
 .form-container textarea {
   min-height: 80px;
   resize: vertical;
+}
+
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.transition {
+  transition: all 0.3s ease;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
 }
