@@ -44,11 +44,12 @@ npm install
 
 4. Run the backend server
 ```bash
-npm start
+cd backend
+node server.js
 
 5. Frontend setup
 ```bash
-cd ../frontend
+cd frontend
 npm install
 npm start
 
